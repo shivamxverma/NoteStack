@@ -31,7 +31,6 @@ export default function NotesDashboard() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  // Uncomment and use filteredNotes for search functionality
   const filteredNotes = notes.filter(
     (note) =>
       note.title?.toLowerCase().includes(search.toLowerCase()) ||
@@ -40,9 +39,8 @@ export default function NotesDashboard() {
 
   const toggleFavorite = async (id) => {
     try {
-      await axios.put(
+      await axios.post(
         `http://localhost:8000/api/v1/notes/${id}/favorite`,
-        {},
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

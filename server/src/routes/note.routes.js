@@ -1,12 +1,12 @@
 import {Router} from 'express';
-import { createNote, deleteNote, getAllNotes, updateNote , searchNote,markFavorite } from '../controllers/note.controller.js';
+import { createNote, deleteNote, getAllNotes, updateNote ,getNoteById, searchNote,markFavorite } from '../controllers/note.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
 // Public Routes
 router.route("/").get(verifyJWT, getAllNotes);
-// router.route("/:id").get(getNoteById);
+router.route("/:id").get(verifyJWT, getNoteById);
 
 // Secured Routes
 router.route("/").post(verifyJWT, createNote);

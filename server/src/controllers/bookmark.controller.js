@@ -10,6 +10,19 @@ const getAllBookmarks = asyncHandler(async (req, res) => {
     );
 });
 
+const getBookmarkById = asyncHandler(async (req, res) => {
+    const { bookmarkId } = req.params;
+    const bookmark = await Bookmark.findOne({ _id: bookmarkId, user: req.user._id }).populate("user", "username fullName email");
+
+    if (!bookmark) {
+        throw new ApiError(404, "Bookmark not found or you do not have permission to access it");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, bookmark, "Bookmark fetched successfully")
+    );
+});
+
 const createBookmark = asyncHandler(async (req, res) => {
     const { title, url, tags } = req.body;
 
@@ -116,4 +129,4 @@ const markFavorite = asyncHandler(async (req, res) => {
     );
 })
 
-export { getAllBookmarks, createBookmark, updateBookmark, deleteBookmark, searchBookmarks, markFavorite };
+export { getAllBookmarks, createBookmark, updateBookmark, deleteBookmark, getBookmarkById, searchBookmarks, markFavorite };

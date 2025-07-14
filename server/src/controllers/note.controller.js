@@ -10,6 +10,19 @@ const getAllNotes = asyncHandler(async (req, res) => {
     );
 });
 
+const getNoteById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const note = await Note.findOne({ _id: id, user: req.user._id }).populate("user", "username fullName email");
+
+    if (!note) {
+        throw new ApiError(404, "Note not found or you do not have permission to access it");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, note, "Note fetched successfully")
+    );
+});
+
 const createNote = asyncHandler(async (req, res) => {
     const { title, content ,tags } = req.body;
 
@@ -120,6 +133,7 @@ const markFavorite = asyncHandler(async (req, res) => {
     }
 
     if (req.user.favoritesNotes.includes(noteId)) {
+        // req.user.favoritesNotes.pull(noteId);
         return res.status(400).json(
             new ApiResponse(400, {}, "Note is already in favorites")
         );
@@ -134,4 +148,4 @@ const markFavorite = asyncHandler(async (req, res) => {
 })
 
 
-export { getAllNotes, createNote ,updateNote ,deleteNote ,searchNote ,markFavorite };
+export { getAllNotes, createNote ,updateNote ,deleteNote ,searchNote ,markFavorite ,getNoteById };

@@ -1,17 +1,21 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import axios from 'axios';
 
-export default function EditBookmark({ params }) {
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+export default function EditBookmark() {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
+  const [tags, setTags] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-  const { id } = params;
+  const { id } = useParams();
 
   useEffect(() => {
-    const fetchBookmarks = async () => {
+    const fetchBookmark = async () => {
       try {
         const token = localStorage.getItem('accessToken');
         if (!token) {
@@ -20,16 +24,17 @@ export default function EditBookmark({ params }) {
           return;
         }
 
-        const response = await axios.get(`http://localhost:8000/api/v1/bookmarks/${id}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/v1/bookmarks/${id}`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
         const bookmark = response.data;
-        console.log('API response:', bookmark); 
         setTitle(bookmark.title || '');
         setUrl(bookmark.url || '');
+        setTags(bookmark.tags ? bookmark.tags.join(', ') : ''); // Assuming tags is an array
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching bookmark:', error);
@@ -38,34 +43,49 @@ export default function EditBookmark({ params }) {
       }
     };
 
-    if (id) fetchBookmarks();
+    if (id) fetchBookmark();
   }, [id, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
         alert('Please log in to edit bookmarks.');
         router.push('/login');
+        setIsSubmitting(false);
         return;
       }
 
-      const response = await axios.put(
-        `http://localhost:8000/api/v1/bookmarks/${id}`,
-        { title, url },
+      // Basic URL validation
+      try {
+        new URL(url);
+      } catch {
+        alert('Please enter a valid URL.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Convert tags to array
+      const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+
+      await axios.put(
+        `${API_BASE_URL}/api/v1/bookmarks/${id}`,
+        { title, url, tags: tagsArray },
         {
           withCredentials: true,
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (response.status !== 200) {
-        throw new Error('Failed to update bookmark');
-      }
+
       router.push('/bookmarks');
     } catch (error) {
       console.error('Error updating bookmark:', error);
       alert('Failed to update bookmark. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -74,15 +94,15 @@ export default function EditBookmark({ params }) {
   }
 
   return (
-    <div>
+    <div className="max-w-md mx-auto mt-8">
       <h1 className="text-2xl font-bold mb-4">Edit Bookmark</h1>
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <input
@@ -90,11 +110,24 @@ export default function EditBookmark({ params }) {
           placeholder="URL"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          更新书签
+        <input
+          type="text"
+          placeholder="Tags (comma-separated)"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`w-full p-2 text-white rounded ${
+            isSubmitting ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+          }`}
+        >
+          {isSubmitting ? 'Updating...' : 'Update Bookmark'}
         </button>
       </form>
     </div>

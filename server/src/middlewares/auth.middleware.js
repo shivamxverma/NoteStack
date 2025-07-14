@@ -5,14 +5,14 @@ import User from '../models/user.model.js';
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
     try {
-        console.log('Cookies:', req.cookies);
-        console.log('Headers:', req.headers);
+        // console.log('Cookies:', req.cookies);
+        // console.log('Headers:', req.headers);
 
         const token = req.headers.authorization?.startsWith('Bearer ')
             ? req.headers.authorization.split(' ')[1]
             : req.cookies?.accessToken;
 
-        console.log('Extracted Token:', token);
+        // console.log('Extracted Token:', token);
 
         if (!token) {
             throw new ApiError(401, 'Unauthorized Request: No token provided');

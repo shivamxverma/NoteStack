@@ -1,30 +1,34 @@
 'use client';
-import { useState, useEffect ,use } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import axios from 'axios';
 
-export default async function EditNote({params}) {
+export default function EditNote() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
-  const { slug } = await params
+  const { id } = useParams(); 
+
+  console.log('EditNote component mounted with id:', id);
 
   useEffect(() => {
     const fetchNote = async () => {
-      if (!id) return;
+      console.log('Fetching note with id:', id);
+      if (!id) return; // Ensure id exists
       try {
         setLoading(true);
+        console.log('Fetching note from API...');
         const response = await axios.get(`http://localhost:8000/api/v1/notes/${id}`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
-        
-        const note = response.data.data; // Adjust based on your API response structure
+
+        const note = response.data.data; 
         if (note) {
           setTitle(note.title || '');
           setContent(note.content || '');
@@ -37,13 +41,13 @@ export default async function EditNote({params}) {
         setLoading(false);
       }
     };
-    
+
     fetchNote();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!title.trim() || !content.trim()) {
       alert('Title and content are required');
       return;
@@ -54,8 +58,8 @@ export default async function EditNote({params}) {
       content: content.trim(),
       tags: tags
         .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag.length > 0),
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0),
     };
 
     try {
@@ -67,14 +71,7 @@ export default async function EditNote({params}) {
         },
       });
 
-      // Update localStorage only if necessary (consider removing if API is source of truth)
-      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-      const updatedNotes = notes.map(note =>
-        note.id === id ? { ...note, ...updatedNote } : note
-      );
-      localStorage.setItem('notes', JSON.stringify(updatedNotes));
-      
-      router.push('/notes');
+      router.push('/api/notes');
     } catch (error) {
       console.error('Error updating note:', error);
       alert('Failed to update note. Please try again.');
