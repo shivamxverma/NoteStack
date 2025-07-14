@@ -1,0 +1,17 @@
+*.env
+/node_modules
+/dist
+/build
+/.cache
+/.next
+/.nuxt
+/.vscode
+/.idea
+/.git
+/.DS_Store
+/.eslintcache
+/.nyc_output
+/.sass-cache
+/.cache-loader
+/.yarn
+/.pnp               
