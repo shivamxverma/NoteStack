@@ -28,7 +28,11 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: [8, 'Password must be at least 8 characters long'],
     },
-    favorites: {
+    favoritesNotes: {
+        type: [String],
+        default: [],
+    },
+    favoritesBookmarks: {
         type: [String],
         default: [],
     },

@@ -11,7 +11,7 @@ const noteSchema = new mongoose.Schema(
     content: {
       type: String,
       required: true,
-      trim: true, 
+      trim: true,
       maxlength: [5000, 'Content cannot exceed 5000 characters'],
     },
     tags: {
@@ -26,6 +26,10 @@ const noteSchema = new mongoose.Schema(
         message: 'Each tag must be a string with a maximum length of 50 characters',
       },
     },
+    visited: {
+      type: Date,
+      default: () => new Date(),
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -33,11 +37,13 @@ const noteSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 
 noteSchema.index({ content: 'text', tags: 'text' });
+
+noteSchema.index({ visited: 1 });
 
 const Note = mongoose.model('Note', noteSchema);
 

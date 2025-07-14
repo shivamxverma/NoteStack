@@ -1,11 +1,13 @@
-import asyncHandler from "../utils/asyncHandler";
-import Note from "../models/note.model.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import Note from "../models/notes.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const getAllNotes = asyncHandler(async (req, res) => {
     const notes = await Note.find({ user: req.user._id }).populate("user", "username fullName email");
-    return new ApiResponse(200, "Notes fetched successfully", notes).send(res);
+    return res.status(200).json(
+        new ApiResponse(200,notes, "Notes fetched successfully")
+    );
 });
 
 const createNote = asyncHandler(async (req, res) => {
@@ -35,12 +37,16 @@ const createNote = asyncHandler(async (req, res) => {
         user: req.user,
     });
 
-    return new ApiResponse(201, "Note created successfully", note).send(res);
+    return res.status(200).json(
+        new ApiResponse(200,note, "Note created successfully")
+    );
 });
 
 
 const updateNote = asyncHandler(async (req, res) => {
     const { noteId } = req.params;
+    // console.log("Note ID", noteId);
+    // console.log(req.body);
     const { title, content, tags } = req.body;
 
     if (!title || !content) {
@@ -53,11 +59,17 @@ const updateNote = asyncHandler(async (req, res) => {
         { new: true, runValidators: true }
     );
 
+    console.log("Updated Note", note);
+
+    console.log("User ID", req.user._id);
+
     if (!note) {
         throw new ApiError(404, "Note not found or you do not have permission to update it");
     }
 
-    return new ApiResponse(200, "Note updated successfully", note).send(res);
+    return res.status(200).json(
+        new ApiResponse(200, {},"Note updated successfully")
+    );
 })
 
 
@@ -69,7 +81,9 @@ const deleteNote = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Note not found or you do not have permission to delete it");
     }
 
-    return new ApiResponse(200, "Note deleted successfully").send(res);
+    return res.status(200).json(
+        new ApiResponse(200,{}, "Note deleted successfully")
+    );
 })
 
 const searchNote = asyncHandler(async (req, res) => {
@@ -92,9 +106,32 @@ const searchNote = asyncHandler(async (req, res) => {
 
     const notes = await Note.find(searchQuery);
 
-    return new ApiResponse(200, "Notes retrieved successfully", notes).send(res);
+    return res.status(200).json(
+        new ApiResponse(200, notes, "Notes retrieved successfully")
+    );
 });
 
+const markFavorite = asyncHandler(async (req, res) => {
+    const { noteId } = req.params;
+
+    const note = await Note.findOne({ _id: noteId, user: req.user._id });
+    if (!note) {
+        throw new ApiError(404, "Note not found or you do not have permission to access it");
+    }
+
+    if (req.user.favorites.includes(noteId)) {
+        return res.status(400).json(
+            new ApiResponse(400, {}, "Note is already in favorites")
+        );
+    }
+
+    req.user.favoritesNotes.push(noteId);
+    await req.user.save();
+
+    return res.status(200).json(
+        new ApiResponse(200, noteId, "Note marked as favorite successfully")
+    );
+})
 
 
-export { getAllNotes, createNote ,updateNote ,deleteNote ,searchNote };
+export { getAllNotes, createNote ,updateNote ,deleteNote ,searchNote ,markFavorite };

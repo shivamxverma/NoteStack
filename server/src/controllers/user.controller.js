@@ -105,21 +105,15 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User doesn't Exist");
     }
 
-    console.log(user);
-
+    // console.log(user);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    // if(!isPasswordValid){
-    //     throw new ApiError(401,"Invalid user Password");
+    // if (!isPasswordValid) {
+    //     throw new ApiError(401, "Invalid password");
     // }
 
-    // console.log(isPasswordValid)
-
     const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
-
-    // console.log("Access Token");
-    // console.log("Refresh Token");
 
     console.log(accessToken);
     console.log(refreshToken);
@@ -133,14 +127,15 @@ const loginUser = asyncHandler(async (req, res) => {
     console.log(LoggedInUser);
 
     const options = {
-        httpOnly: true,
-        secure: true
+        httpOnly: false,
+        secure: false
     }
 
     return res
         .status(200)
         .cookie("AccessToken", accessToken, options)
         .cookie("RefreshToken", refreshToken, options)
+        .setHeader('Authorization', `Bearer ${accessToken}`)
         .json(
             new ApiResponse(
                 200,
@@ -168,8 +163,8 @@ const LogoutUser = asyncHandler(async (req, res) => {
     );
 
     const options = {
-        httpOnly: true,
-        secure: true
+        httpOnly: false,
+        secure: false
     };
 
     return res
@@ -200,8 +195,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         }
 
         const options = {
-            httpOnly: true,
-            secure: true
+            httpOnly: false,
+            secure: false
         }
 
         const { AccesToken, newRefreshToken } = await generateAccessTokenAndRefreshToken(user._id);

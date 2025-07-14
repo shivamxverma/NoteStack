@@ -15,6 +15,9 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 import userRoutes from './routes/user.routes.js';
+import noteRoutes from './routes/note.routes.js';
+
+app.use('/api/v1/notes', noteRoutes);
 
 app.use('/api/v1/users', userRoutes);
 

@@ -5,34 +5,17 @@ import User from '../models/user.model.js';
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
     try {
-        let token;
-        console.log(req.cookie);
-        // Try to extract token from cookies (if present)
-        if (req.cookie && req.cookie.accessToken) {
-            token = req.cookie.accessToken;
-        } else if (req.headers.cookie) {
-            // Manually parse cookies from header if req.cookies is not populated
-            const cookies = req.headers.cookie.split(';').reduce((acc, cookie) => {
-            const [key, value] = cookie.trim().split('=');
-            acc[key] = value;
-            return acc;
-            }, {});
-            token = cookies.accessToken;
-        }
-        // Fallback to Authorization header
-        if (!token) {
-            const authHeader = req.header("Authorization");
-            if (authHeader && authHeader.startsWith("Bearer ")) {
-            token = authHeader.replace("Bearer ", "");
-            }
-        }
+        // console.log("Headers:", req.headers);
+        // console.log("Cookies:", req.cookies);
 
-        console.log("Cookies:", req.cookies); 
-        console.log("Authorization Header:", req.header("Authorization")); 
-        console.log("Token:", token); 
+        const token = req.headers.authorization?.startsWith('Bearer ')
+            ? req.headers.authorization.split(' ')[1]
+            : req.cookies?.AccessToken;
+
+        console.log("Extracted Token:", token);
 
         if (!token) {
-            throw new ApiError(401, "Unauthorized Request");
+            throw new ApiError(401, "Unauthorized Request: No token provided");
         }
 
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -43,14 +26,11 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
         }
 
         req.user = user;
-
         next();
     } catch (error) {
-        // console.error("Error in verifyJWT:", error);
-
         const statusCode = error instanceof ApiError ? error.statusCode : 500;
         const message = error instanceof ApiError ? error.message : "Internal Server Error";
-
+        console.error("JWT Verification Error:", error);
         return res.status(statusCode).json({
             status: "error",
             message: message
