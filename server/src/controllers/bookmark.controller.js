@@ -1,11 +1,13 @@
-import asyncHandler from "../utils/asyncHandler";
+import asyncHandler from "../utils/asyncHandler.js";
 import Bookmark from "../models/bookmark.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const getAllBookmarks = asyncHandler(async (req, res) => {
     const bookmarks = await Bookmark.find({ user: req.user._id }).populate("user", "username fullName email");
-    return new ApiResponse(200, "Bookmarks fetched successfully", bookmarks).send(res);
+    return res.status(200).json(
+        new ApiResponse(200, bookmarks, "Bookmarks fetched successfully")
+    );
 });
 
 const createBookmark = asyncHandler(async (req, res) => {
@@ -31,7 +33,9 @@ const createBookmark = asyncHandler(async (req, res) => {
         user: req.user._id,
     });
     
-    return new ApiResponse(201, "Bookmark created successfully", bookmark).send(res);
+    return res.status(200).json(
+        new ApiResponse(200, bookmark, "Bookmark Created successfully")
+    );
 });
 
 const updateBookmark = asyncHandler(async (req, res) => {
@@ -52,7 +56,9 @@ const updateBookmark = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Bookmark not found or you do not have permission to update it");
     }
 
-    return new ApiResponse(200, "Bookmark updated successfully", bookmark).send(res);
+    return res.status(200).json(
+        new ApiResponse(200, bookmark, "Bookmark updated successfully")
+    );
 });
 
 const deleteBookmark = asyncHandler(async (req, res) => {
@@ -64,7 +70,9 @@ const deleteBookmark = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Bookmark not found or you do not have permission to delete it");
     }
 
-    return new ApiResponse(200, "Bookmark deleted successfully").send(res);
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Bookmark deleted successfully")
+    );
 })
 
 const searchBookmarks = asyncHandler(async (req, res) => {
@@ -83,7 +91,9 @@ const searchBookmarks = asyncHandler(async (req, res) => {
         ]
     }).populate("user", "username fullName email");
 
-    return new ApiResponse(200, "Bookmarks searched successfully", bookmarks).send(res);
+    return res.status(200).json(
+        new ApiResponse(200, bookmarks, "Bookmarks searched successfully")
+    );
 })
 
 const markFavorite = asyncHandler(async (req, res) => {
@@ -94,14 +104,16 @@ const markFavorite = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Bookmark not found or you do not have permission to access it");
     }
 
-    if (req.user.favorites.includes(bookmarkId)) {
+    if (req.user.favoritesBookmarks.includes(bookmarkId)) {
         return new ApiResponse(400, "Bookmark is already in favorites").send(res);
     }
 
     req.user.favoritesBookmarks.push(bookmarkId);
     await req.user.save();
 
-    return new ApiResponse(200, "Note added to favorites successfully", { noteId }).send(res);
+    return res.status(200).json(
+        new ApiResponse(200, "Bookmark added to favorites successfully", { bookmarkId })
+    );
 })
 
 export { getAllBookmarks, createBookmark, updateBookmark, deleteBookmark, searchBookmarks, markFavorite };

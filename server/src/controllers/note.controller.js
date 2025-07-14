@@ -119,7 +119,7 @@ const markFavorite = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Note not found or you do not have permission to access it");
     }
 
-    if (req.user.favorites.includes(noteId)) {
+    if (req.user.favoritesNotes.includes(noteId)) {
         return res.status(400).json(
             new ApiResponse(400, {}, "Note is already in favorites")
         );
