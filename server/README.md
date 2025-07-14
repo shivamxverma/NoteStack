@@ -12,9 +12,9 @@
    git clone [repo link](https://github.com/shivamxverma/NoteStack.git)
    ```
 
-2. **Navigate to the Client Directory**
+2. **Navigate to the Server Directory**
    ```bash
-   cd client
+   cd server
    ```
 
 3. **Install Dependencies**
@@ -23,10 +23,11 @@
    ```
 
 4. **Set Up Environmental Variables**
-   - Create a `.env` file in the `client` directory.
-   - Add the required environmental variables (e.g., API endpoints, keys) as specified in the `.env.example` file or project documentation.
+   - Create a `.env` file in the `server` directory.
+   - Add the required environmental variables (e.g., database credentials, API keys) as specified in the `.env.example` file or project documentation.
 
 5. **Run the Development Server**
    ```bash
    npm run dev
    ```
+
