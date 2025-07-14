@@ -3,7 +3,9 @@ import User from '../models/user.model.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js'
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+dotenv.config();
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
     try {
@@ -44,7 +46,7 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
 const registerUser = asyncHandler(async (req, res) => {
     const { fullName, email, username, password } = req.body;
 
-    console.log("Body", req.body);
+    // console.log("Body", req.body);
     // console.log(Object.keys(req.body));
 
 
@@ -91,10 +93,10 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
 
-    console.log("Body", req.body);
+    console.log('Body:', req.body);
 
     if (!username && !email) {
-        throw new ApiError(400, "Username or Email is Required");
+        throw new ApiError(400, 'Username or Email is Required');
     }
 
     const user = await User.findOne({
@@ -105,48 +107,51 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User doesn't Exist");
     }
 
-    // console.log(user);
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
+    // const isPasswordValid = await bcrypt.compare(password, user.password);
     // if (!isPasswordValid) {
-    //     throw new ApiError(401, "Invalid password");
+    //     throw new ApiError(401, 'Invalid password');
     // }
 
     const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
 
-    console.log(accessToken);
-    console.log(refreshToken);
-
-    console.log(user);
-
-    const LoggedInUser = await User.findById(user._id).select(
-        "-password -refreshToken"
-    );
-
-    console.log(LoggedInUser);
-
-    const options = {
-        httpOnly: false,
-        secure: false
+    if (!accessToken || !refreshToken) {
+        throw new ApiError(500, 'Failed to generate tokens');
     }
 
-    return res
+    console.log('AccessToken:', accessToken);
+    console.log('RefreshToken:', refreshToken);
+    console.log('Token sizes:', {
+        accessToken: Buffer.byteLength(accessToken, 'utf8'),
+        refreshToken: Buffer.byteLength(refreshToken, 'utf8')
+    });
+
+    const loggedInUser = await User.findById(user._id).select('-password -refreshToken');
+
+    const options = {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax' 
+    };
+
+    res
         .status(200)
-        .cookie("AccessToken", accessToken, options)
-        .cookie("RefreshToken", refreshToken, options)
-        .setHeader('Authorization', `Bearer ${accessToken}`)
-        .json(
-            new ApiResponse(
-                200,
-                {
-                    user: LoggedInUser,
-                    refreshToken,
-                    accessToken
-                },
-                "User LoggedIn SuccessFully",
-            )
+        .cookie('accessToken', accessToken, options)
+        .cookie('refreshToken', refreshToken, options)
+        .cookie('testCookie', 'testValue', options);
+
+    console.log('Set-Cookie Headers:', res.get('Set-Cookie'));
+
+    return res.json(
+        new ApiResponse(
+            200,
+            {
+                user: loggedInUser,
+                refreshToken,
+                accessToken
+            },
+            'User Logged In Successfully'
         )
+    );
 });
 
 const LogoutUser = asyncHandler(async (req, res) => {

@@ -5,35 +5,35 @@ import User from '../models/user.model.js';
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
     try {
-        // console.log("Headers:", req.headers);
-        // console.log("Cookies:", req.cookies);
+        console.log('Cookies:', req.cookies);
+        console.log('Headers:', req.headers);
 
         const token = req.headers.authorization?.startsWith('Bearer ')
             ? req.headers.authorization.split(' ')[1]
-            : req.cookies?.AccessToken;
+            : req.cookies?.accessToken;
 
-        console.log("Extracted Token:", token);
+        console.log('Extracted Token:', token);
 
         if (!token) {
-            throw new ApiError(401, "Unauthorized Request: No token provided");
+            throw new ApiError(401, 'Unauthorized Request: No token provided');
         }
 
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
+        const user = await User.findById(decodedToken?._id).select('-password -refreshToken');
 
         if (!user) {
-            throw new ApiError(401, "Invalid Access Token");
+            throw new ApiError(401, 'Invalid Access Token');
         }
 
         req.user = user;
         next();
     } catch (error) {
         const statusCode = error instanceof ApiError ? error.statusCode : 500;
-        const message = error instanceof ApiError ? error.message : "Internal Server Error";
-        console.error("JWT Verification Error:", error);
+        const message = error instanceof ApiError ? error.message : 'Internal Server Error';
+        console.error('JWT Verification Error:', error.message);
         return res.status(statusCode).json({
-            status: "error",
-            message: message
+            status: 'error',
+            message
         });
     }
 });
