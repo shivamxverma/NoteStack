@@ -63,7 +63,13 @@ const registerUser = asyncHandler(async (req, res) => {
         ]
     })
 
-    console.log(ExistedUser);
+    // console.log(ExistedUser);
+
+    const hadhedPassword = await bcrypt.hash(password, 10);
+
+    if (!hadhedPassword) {
+        throw new ApiError(500, "Something Went Wrong While Hashing Password");
+    }
 
     if (ExistedUser) {
         throw new ApiError(409, "Username or Email already exists");
@@ -74,7 +80,7 @@ const registerUser = asyncHandler(async (req, res) => {
         username: username,
         email,
         fullName,
-        password
+        password : hadhedPassword,
     })
 
     const CreatedUser = await User.findById(user._id).select(
@@ -107,10 +113,10 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User doesn't Exist");
     }
 
-    // const isPasswordValid = await bcrypt.compare(password, user.password);
-    // if (!isPasswordValid) {
-    //     throw new ApiError(401, 'Invalid password');
-    // }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new ApiError(401, 'Invalid password');
+    }
 
     const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
 
