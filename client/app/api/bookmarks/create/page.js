@@ -59,7 +59,7 @@ export default function CreateBookmark() {
       const response = await axios.post('https://notestack-o6b5.onrender.com/api/v1/bookmarks', newBookmark, {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
       console.log('Bookmark created:', response.data);

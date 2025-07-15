@@ -19,14 +19,27 @@ export default function LoginPage() {
     try {
       const response = await axios.post(
         'https://notestack-o6b5.onrender.com/api/v1/users/login',
-        data,
-        { withCredentials: true }
+        {
+          email: data.email,
+          password: data.password,
+        },
+        {
+          withCredentials: true, 
+        }
       );
-      console.log('Login successful:', response.data);
-      localStorage.setItem('token', response.data.message.accessToken);
+
+      const accessToken = response.data.message.accessToken; 
+      if (!accessToken) {
+        throw new Error('No access token received');
+      }
+
+      console.log('Login successful:', response.data.message.accessToken);
+      localStorage.setItem('accessToken', accessToken);
       router.push('/');
     } catch (err) {
-      alert(err.response?.data?.message || 'Login failed');
+      const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
+      alert(errorMessage);
+      console.error('Login error:', err);
     }
   };
 
@@ -35,6 +48,23 @@ export default function LoginPage() {
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Username Field (Optional, uncomment if required by backend) */}
+          {/* <div className="mb-4">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              {...register('username')}
+              className={`mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring-2 ${
+                errors.username ? 'border-red-500' : 'focus:ring-blue-500'
+              }`}
+            />
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
+            )}
+          </div> */}
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
@@ -63,7 +93,6 @@ export default function LoginPage() {
             />
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-
             )}
           </div>
           <button

@@ -67,7 +67,7 @@ export default function BookmarksDashboard() {
         const response = await axios.get('https://notestack-o6b5.onrender.com/api/v1/bookmarks', {
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
         console.log('API Response:', response.data.message);
@@ -119,7 +119,7 @@ export default function BookmarksDashboard() {
         {
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       );
@@ -139,7 +139,7 @@ export default function BookmarksDashboard() {
       await axios.delete(`https://notestack-o6b5.onrender.com/api/v1/bookmarks/${id}`, {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
       setBookmarks(bookmarks.filter(bookmark => bookmark._id !== id));

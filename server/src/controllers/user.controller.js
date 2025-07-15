@@ -95,75 +95,71 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-    const { username, email, password } = req.body;
+  const { username, email, password } = req.body;
 
-    console.log('Body:', req.body);
+  console.log('Body:', req.body);
 
-    if (!username && !email) {
-        throw new ApiError(400, 'Username or Email is Required');
-    }
+  if (!username && !email) {
+    throw new ApiError(400, 'Username or Email is Required');
+  }
 
-    const user = await User.findOne({
-        $or: [{ username }, { email }]
-    });
+  const user = await User.findOne({
+    $or: [{ username }, { email }],
+  });
 
-    if (!user) {
-        throw new ApiError(404, "User doesn't Exist");
-    }
+  if (!user) {
+    throw new ApiError(404, "User doesn't Exist");
+  }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-        throw new ApiError(401, 'Invalid password');
-    }
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw new ApiError(401, 'Invalid password');
+  }
 
-    const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
+  const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
 
-    if (!accessToken || !refreshToken) {
-        throw new ApiError(500, 'Failed to generate tokens');
-    }
+  if (!accessToken || !refreshToken) {
+    throw new ApiError(500, 'Failed to generate tokens');
+  }
 
-    console.log('AccessToken:', accessToken);
-    console.log('RefreshToken:', refreshToken);
-    console.log('Token sizes:', {
-        accessToken: Buffer.byteLength(accessToken, 'utf8'),
-        refreshToken: Buffer.byteLength(refreshToken, 'utf8')
-    });
+  console.log('AccessToken:', accessToken);
+  console.log('RefreshToken:', refreshToken);
 
-    const loggedInUser = await User.findById(user._id).select('-password -refreshToken');
+  const loggedInUser = await User.findById(user._id).select('-password -refreshToken');
 
-    const options = {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'none',
-        maxAge: 24 * 60 * 60 * 1000
-    };
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    maxAge: 24 * 60 * 60 * 1000,
+  };
 
-    const refreshTokenOptions = {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'none',
-        maxAge: 30 * 24 * 60 * 60 * 1000 
-    };
+  const refreshTokenOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  };
 
-    res
-        .status(200)
-        .cookie('accessToken', accessToken, options)
-        .cookie('refreshToken', refreshToken, refreshTokenOptions)
-        .cookie('testCookie', 'testValue', options);
+  res
+    .status(200)
+    .cookie('accessToken', accessToken, options)
+    .cookie('refreshToken', refreshToken, refreshTokenOptions)
+    .cookie('testCookie', 'testValue', options);
 
-    console.log('Set-Cookie Headers:', res.get('Set-Cookie'));
+  console.log('Set-Cookie Headers:', res.get('Set-Cookie'));
 
-    return res.json(
-        new ApiResponse(
-            200,
-            { 
-                user: loggedInUser,
-                accessToken: accessToken,
-                refreshToken: refreshToken
-            },
-            'User Logged In Successfully'
-        )
-    );
+  return res.json(
+    new ApiResponse(
+      200,
+      {
+        user: loggedInUser,
+        accessToken,
+        refreshToken,
+      },
+      'User Logged In Successfully'
+    )
+  );
 });
 
 const LogoutUser = asyncHandler(async (req, res) => {

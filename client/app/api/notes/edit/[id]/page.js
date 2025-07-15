@@ -24,7 +24,7 @@ export default function EditNote() {
         const response = await axios.get(`https://notestack-o6b5.onrender.com/api/v1/notes/${id}`, {
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
 
@@ -67,7 +67,7 @@ export default function EditNote() {
       await axios.put(`https://notestack-o6b5.onrender.com/api/v1/notes/${id}`, updatedNote, {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
 
