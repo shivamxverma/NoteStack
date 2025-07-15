@@ -5,9 +5,9 @@ export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/api/notes') || pathname.startsWith('/api/bookmarks') || pathname.startsWith('/api/dashboard')) {
-    const token = request.cookies.get('accessToken')?.value; // Correct way to access cookie
+    const token = request.cookies.get('accessToken')?.value; 
 
-    // console.log('AccessToken:', token);
+    console.log('Access Token:', token);
 
     if (!token) {
       console.log('No accessToken found, redirecting to login');
@@ -15,8 +15,6 @@ export async function middleware(request) {
     }
 
     try {
-      // console.log(process.env.ACCESS_TOKEN_SECRET);
-      // jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       return NextResponse.next();
     } catch (error) {
       console.error('Token verification failed:', error.message);
