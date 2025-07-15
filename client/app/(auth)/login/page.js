@@ -22,9 +22,7 @@ export default function LoginPage() {
         data,
         { withCredentials: true }
       );
-      console.log(response.data);
-      localStorage.setItem('userId', response.data.message.user.id);
-      // No need to store accessToken; it’s handled by the cookie
+      localStorage.setItem('token', response.data.message.accessToken);
       router.push('/');
     } catch (err) {
       alert(err.response?.data?.message || 'Login failed');
