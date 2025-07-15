@@ -6,6 +6,7 @@ export async function middleware(request) {
 
   if (pathname.startsWith('/api/notes') || pathname.startsWith('/api/bookmarks') || pathname.startsWith('/api/dashboard')) {
     const token = request.cookies.get('accessToken')?.value; 
+    console.log(request.cookies);
 
     console.log('Access Token:', token);
 

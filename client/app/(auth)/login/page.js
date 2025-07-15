@@ -22,6 +22,7 @@ export default function LoginPage() {
         data,
         { withCredentials: true }
       );
+      console.log('Login successful:', response.data);
       localStorage.setItem('token', response.data.message.accessToken);
       router.push('/');
     } catch (err) {
