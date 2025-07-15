@@ -118,14 +118,16 @@ const markFavorite = asyncHandler(async (req, res) => {
     }
 
     if (req.user.favoritesBookmarks.includes(bookmarkId)) {
-        return new ApiResponse(400, "Bookmark is already in favorites").send(res);
+        req.user.favoritesBookmarks = req.user.favoritesBookmarks.filter(id => id.toString() !== bookmarkId.toString());
+        await req.user.save();
+        return new ApiResponse(200,{}, "Bookmark is Rmoved in favorites");
     }
 
     req.user.favoritesBookmarks.push(bookmarkId);
     await req.user.save();
 
     return res.status(200).json(
-        new ApiResponse(200, "Bookmark added to favorites successfully", { bookmarkId })
+        new ApiResponse(200,{bookmarkId}, "Bookmark added to favorites successfully")
     );
 })
 

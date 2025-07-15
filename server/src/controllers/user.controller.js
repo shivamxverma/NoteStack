@@ -46,10 +46,6 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
 const registerUser = asyncHandler(async (req, res) => {
     const { fullName, email, username, password } = req.body;
 
-    // console.log("Body", req.body);
-    // console.log(Object.keys(req.body));
-
-
     if (
         [fullName, email, password, username].some((field) => field?.trim() === "")
     ) {
@@ -121,9 +117,6 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!accessToken || !refreshToken) {
     throw new ApiError(500, 'Failed to generate tokens');
   }
-
-  console.log('AccessToken:', accessToken);
-  console.log('RefreshToken:', refreshToken);
 
   const loggedInUser = await User.findById(user._id).select('-password -refreshToken');
 

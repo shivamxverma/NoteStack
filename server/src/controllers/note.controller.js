@@ -58,8 +58,6 @@ const createNote = asyncHandler(async (req, res) => {
 
 const updateNote = asyncHandler(async (req, res) => {
     const { noteId } = req.params;
-    // console.log("Note ID", noteId);
-    // console.log(req.body);
     const { title, content, tags } = req.body;
 
     if (!title || !content) {
@@ -133,9 +131,10 @@ const markFavorite = asyncHandler(async (req, res) => {
     }
 
     if (req.user.favoritesNotes.includes(noteId)) {
-        // req.user.favoritesNotes.pull(noteId);
-        return res.status(400).json(
-            new ApiResponse(400, {}, "Note is already in favorites")
+        req.user.favoritesNotes = req.user.favoritesNotes.filter(id => id.toString() !== noteId.toString());
+        await req.user.save();
+        return res.status(200).json(
+            new ApiResponse(200, {}, "Note removed from favorites")
         );
     }
 
