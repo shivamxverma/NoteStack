@@ -2,8 +2,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export default function NotesDashboard() {
+  const router = useRouter();
   const [notes, setNotes] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -12,6 +14,10 @@ export default function NotesDashboard() {
   useEffect(() => {
     const fetchNotes = async () => {
       const accessToken = localStorage.getItem('accessToken');
+      if(!accessToken){
+        router.push('/login');
+        return;
+      }
       try {
         const response = await axios.get('https://notestack-o6b5.onrender.com/api/v1/notes', {
           headers: {

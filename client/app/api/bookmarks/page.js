@@ -8,17 +8,17 @@ import { z } from 'zod';
 const querySchema = z.object({
   search: z
     .string()
-    .nullable() 
+    .nullable()
     .optional()
     .transform(val => val?.trim() || ''),
   tags: z
     .string()
-    .nullable() 
+    .nullable()
     .optional()
     .transform(val => val?.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) || []),
   favorite: z
     .string()
-    .nullable() 
+    .nullable()
     .optional()
     .transform(val => val === 'true' ? true : val === 'false' ? false : undefined),
 });
@@ -40,8 +40,24 @@ export default function BookmarksDashboard() {
   const [tags, setTags] = useState('');
   const [favorite, setFavorite] = useState(undefined);
   const [errors, setErrors] = useState({ form: '' });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Check authentication status on mount
   useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      router.push('/login');
+    } else {
+      setIsAuthenticated(true);
+    }
+    setIsLoading(false);
+  }, [router]);
+
+  // Parse query parameters
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
     try {
       const validated = querySchema.parse({
         search: searchParams.get('search'),
@@ -59,44 +75,111 @@ export default function BookmarksDashboard() {
       setTags('');
       setFavorite(undefined);
     }
-  }, [searchParams]);
+  }, [searchParams, isAuthenticated]);
 
+  // Fetch bookmarks
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const fetchBookmarks = async () => {
       try {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          router.push('/login');
+          return;
+        }
+
         const response = await axios.get('https://notestack-o6b5.onrender.com/api/v1/bookmarks', {
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${accessToken}`, // Use accessToken here
           },
         });
-        console.log('API Response:', response.data.message);
+
         setBookmarks(Array.isArray(response.data.message) ? response.data.message : []);
         setErrors({ form: '' });
       } catch (error) {
         console.error('Error fetching bookmarks:', error);
         setErrors({ form: 'Failed to fetch bookmarks. Please try again.' });
+        if (error.response?.status === 401) {
+          localStorage.removeItem('accessToken');
+          router.push('/login');
+        }
       }
     };
+
     fetchBookmarks();
-  }, []);
+  }, [isAuthenticated, router]);
 
-  // Log bookmarks when they change
+  // Update URL with search parameters
   useEffect(() => {
-    console.log('Bookmarks:', bookmarks);
-  }, [bookmarks]);
+    if (!isAuthenticated) return;
 
-
-  useEffect(() => {
     const currentParams = new URLSearchParams();
     if (search) currentParams.set('search', search);
     if (tags) currentParams.set('tags', tags);
     if (favorite !== undefined) currentParams.set('favorite', favorite.toString());
     router.replace(`?${currentParams.toString()}`, { scroll: false });
-  }, [search, tags, favorite, router]);
+  }, [search, tags, favorite, router, isAuthenticated]);
 
+  // Toggle favorite status
+  const toggleFavorite = async (id) => {
+    if (!isAuthenticated) return;
+
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await axios.post(
+        `https://notestack-o6b5.onrender.com/api/v1/bookmarks/${id}/favorite`,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const updatedBookmarks = bookmarks.map(bookmark =>
+        bookmark._id === id ? { ...bookmark, favorite: !bookmark.favorite } : bookmark
+      );
+      setBookmarks(updatedBookmarks);
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem('accessToken');
+        router.push('/login');
+      } else {
+        alert('Failed to toggle favorite. Please try again.');
+      }
+    }
+  };
+
+  // Delete bookmark
+  const deleteBookmark = async (id) => {
+    if (!isAuthenticated) return;
+
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      await axios.delete(`https://notestack-o6b5.onrender.com/api/v1/bookmarks/${id}`, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setBookmarks(bookmarks.filter(bookmark => bookmark._id !== id));
+    } catch (error) {
+      console.error('Error deleting bookmark:', error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem('accessToken');
+        router.push('/login');
+      } else {
+        alert('Failed to delete bookmark. Please try again.');
+      }
+    }
+  };
+
+  // Filter bookmarks
   const filteredBookmarks = bookmarks
-    .filter(bookmark => bookmark._id) 
+    .filter(bookmark => bookmark._id)
     .filter(bookmark => {
       const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
       return (
@@ -111,48 +194,17 @@ export default function BookmarksDashboard() {
       );
     });
 
-  const toggleFavorite = async (id) => {
-    try {
-      const response = await axios.post(
-        `https://notestack-o6b5.onrender.com/api/v1/bookmarks/${id}/favorite`,
-        {},
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
-      const updatedBookmarks = bookmarks.map(bookmark =>
-        bookmark._id === id ? { ...bookmark, favorite: !bookmark.favorite } : bookmark
-      );
-      setBookmarks(updatedBookmarks);
-      console.log('Bookmark favorite toggled:', response.data);
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      alert('Failed to toggle favorite. Please try again.');
-    }
-  };
+  if (isLoading) {
+    return <div className="p-4">Loading...</div>;
+  }
 
-  const deleteBookmark = async (id) => {
-    try {
-      await axios.delete(`https://notestack-o6b5.onrender.com/api/v1/bookmarks/${id}`, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      setBookmarks(bookmarks.filter(bookmark => bookmark._id !== id));
-      console.log('Bookmark deleted:', id);
-    } catch (error) {
-      console.error('Error deleting bookmark:', error);
-      alert('Failed to delete bookmark. Please try again.');
-    }
-  };
+  if (!isAuthenticated) {
+    return null; // or a minimal loading state while redirecting
+  }
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Bookmarks Dashboard</h1>
+      <h1 className="text-2xl font-bold mb- Hawkins">Bookmarks Dashboard</h1>
       <div className="mb-4 flex flex-col gap-4">
         <input
           type="text"
@@ -168,7 +220,7 @@ export default function BookmarksDashboard() {
           onChange={(e) => setTags(e.target.value)}
           className="w-full p-2 border rounded"
         />
-        <select cag
+        <select
           value={favorite === undefined ? '' : favorite.toString()}
           onChange={(e) => setFavorite(e.target.value === '' ? undefined : e.target.value === 'true')}
           className="w-full p-2 border rounded"

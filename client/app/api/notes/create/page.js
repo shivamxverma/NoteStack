@@ -9,6 +9,11 @@ export default function CreateNote() {
   const [tags, setTags] = useState('');
   const router = useRouter();
 
+  if(!localStorage.getItem('accessToken')) {
+    router.push('/login');
+    return null;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
