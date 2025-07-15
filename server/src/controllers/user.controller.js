@@ -63,8 +63,6 @@ const registerUser = asyncHandler(async (req, res) => {
         ]
     })
 
-    // console.log(ExistedUser);
-
     const hadhedPassword = await bcrypt.hash(password, 10);
 
     if (!hadhedPassword) {
@@ -137,7 +135,6 @@ const loginUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         secure: false,
         sameSite: 'none',
-        path: '/',
         maxAge: 24 * 60 * 60 * 1000
     };
 
@@ -145,7 +142,6 @@ const loginUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         secure: false,
         sameSite: 'none',
-        path: '/',
         maxAge: 30 * 24 * 60 * 60 * 1000 
     };
 
