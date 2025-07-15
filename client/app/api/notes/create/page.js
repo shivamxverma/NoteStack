@@ -23,7 +23,7 @@ export default function CreateNote() {
         tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
       };
 
-      const response = await axios.post('http://localhost:8000/api/v1/notes', newNote,{
+      const response = await axios.post('https://notestack-o6b5.onrender.com/api/v1/notes', newNote,{
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`

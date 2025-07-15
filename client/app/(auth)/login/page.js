@@ -1,5 +1,4 @@
 'use client';
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../../lib/schemas';
@@ -19,13 +18,14 @@ export default function LoginPage() {
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/v1/users/login',
+        'https://notestack-o6b5.onrender.com/api/v1/users/login',
         data,
         { withCredentials: true }
       );
       console.log(response.data);
-      // localStorage.setItem('userId',response.data.message.user._id);
-      localStorage.setItem('accessToken', response.data.message.accessToken);
+      // Store user ID in localStorage if needed
+      localStorage.setItem('userId', response.data.message.user.id);
+      // No need to store accessToken; it’s handled by the cookie
       router.push('/');
     } catch (err) {
       alert(err.response?.data?.message || 'Login failed');
@@ -65,6 +65,7 @@ export default function LoginPage() {
             />
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+
             )}
           </div>
           <button

@@ -48,7 +48,6 @@ export default function CreateBookmark() {
     setErrors({ title: '', url: '', tags: '', form: '' });
 
     try {
-      // Validate form data with Zod
       const validatedData = bookmarkSchema.parse({ title, url, tags });
 
       const newBookmark = {
@@ -57,7 +56,7 @@ export default function CreateBookmark() {
         tags: validatedData.tags,
       };
 
-      const response = await axios.post('http://localhost:8000/api/v1/bookmarks', newBookmark, {
+      const response = await axios.post('https://notestack-o6b5.onrender.com/api/v1/bookmarks', newBookmark, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

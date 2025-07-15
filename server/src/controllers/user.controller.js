@@ -129,14 +129,22 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax' 
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+    };
+
+    const refreshTokenOptions = {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/',
     };
 
     res
         .status(200)
         .cookie('accessToken', accessToken, options)
-        .cookie('refreshToken', refreshToken, options)
+        .cookie('refreshToken', refreshToken, refreshTokenOptions)
         .cookie('testCookie', 'testValue', options);
 
     console.log('Set-Cookie Headers:', res.get('Set-Cookie'));
@@ -144,11 +152,7 @@ const loginUser = asyncHandler(async (req, res) => {
     return res.json(
         new ApiResponse(
             200,
-            {
-                user: loggedInUser,
-                refreshToken,
-                accessToken
-            },
+            { user: loggedInUser },
             'User Logged In Successfully'
         )
     );
@@ -174,8 +178,8 @@ const LogoutUser = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .clearCookie("accessToken", options) 
-        .clearCookie("refreshToken", options) 
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
         .json(new ApiResponse(200, {}, "User logged out"));
 });
 

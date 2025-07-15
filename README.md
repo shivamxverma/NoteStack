@@ -39,7 +39,7 @@ NoteStack is a web application for managing notes and bookmarks, providing APIs 
 ### User Authentication
 
 - **Register User**  
-  `POST http://localhost:8000/api/v1/users/register`
+  `POST https://notestack-o6b5.onrender.com/api/v1/users/register`
   ```json
   {
       "fullName": "Shivam Verma",
@@ -50,7 +50,7 @@ NoteStack is a web application for managing notes and bookmarks, providing APIs 
   ```
 
 - **Login**  
-  `POST http://localhost:8000/api/v1/users/login`
+  `POST https://notestack-o6b5.onrender.com/api/v1/users/login`
   ```json
   {
       "username": "shivam12@",
@@ -60,12 +60,12 @@ NoteStack is a web application for managing notes and bookmarks, providing APIs 
   ```
 
 - **Logout**  
-  `POST http://localhost:8000/api/v1/users/logout`
+  `POST https://notestack-o6b5.onrender.com/api/v1/users/logout`
 
 ### Notes Management
 
 - **Create Note**  
-  `POST http://localhost:8000/api/v1/notes`
+  `POST https://notestack-o6b5.onrender.com/api/v1/notes`
   ```json
   {
       "title": "Notes on Http Methods",
@@ -75,10 +75,10 @@ NoteStack is a web application for managing notes and bookmarks, providing APIs 
   ```
 
 - **Get All Notes**  
-  `GET http://localhost:8000/api/v1/notes/687525a2b04520a8bc88eaf5`
+  `GET https://notestack-o6b5.onrender.com/api/v1/notes/687525a2b04520a8bc88eaf5`
 
 - **Update Note**  
-  `PUT http://localhost:8000/api/v1/notes/687526f72d2ce5ac74d56e29`
+  `PUT https://notestack-o6b5.onrender.com/api/v1/notes/687526f72d2ce5ac74d56e29`
   ```json
   {
       "title": "Notes on Http Methods and Headers",
@@ -88,15 +88,15 @@ NoteStack is a web application for managing notes and bookmarks, providing APIs 
   ```
 
 - **Delete Note**  
-  `DELETE http://localhost:8000/api/v1/notes/687526f72d2ce5ac74d56e29`
+  `DELETE https://notestack-o6b5.onrender.com/api/v1/notes/687526f72d2ce5ac74d56e29`
 
 - **Search Notes**  
-  `GET http://localhost:8000/api/v1/notes?q=http%20methods&tags=backend,computer%20science,web%20development`
+  `GET https://notestack-o6b5.onrender.com/api/v1/notes?q=http%20methods&tags=backend,computer%20science,web%20development`
 
 ### Bookmarks Management
 
 - **Create Bookmark**  
-  `POST http://localhost:8000/api/v1/bookmarks`
+  `POST https://notestack-o6b5.onrender.com/api/v1/bookmarks`
   ```json
   {
       "title": "learn marketing",
@@ -106,7 +106,7 @@ NoteStack is a web application for managing notes and bookmarks, providing APIs 
   ```
 
 - **Update Bookmark**  
-  `PUT http://localhost:8000/api/v1/bookmarks`
+  `PUT https://notestack-o6b5.onrender.com/api/v1/bookmarks`
   ```json
   {
       "title": "learn frontend with mastering react",
@@ -116,10 +116,10 @@ NoteStack is a web application for managing notes and bookmarks, providing APIs 
   ```
 
 - **Delete Bookmark**  
-  `DELETE http://localhost:8000/api/v1/bookmarks/6875347aaf623709c2cd6a02`
+  `DELETE https://notestack-o6b5.onrender.com/api/v1/bookmarks/6875347aaf623709c2cd6a02`
 
 - **Search Bookmarks**  
-  `GET http://localhost:8000/api/v1/bookmarks?tags=frontend,react%20science,web%20development`
+  `GET https://notestack-o6b5.onrender.com/api/v1/bookmarks?tags=frontend,react%20science,web%20development`
 
 - **Favorite Bookmark**  
-  `POST http://localhost:8000/api/v1/bookmarks/68753404af623709c2cd69fc/favorite`
+  `POST https://notestack-o6b5.onrender.com/api/v1/bookmarks/68753404af623709c2cd69fc/favorite`

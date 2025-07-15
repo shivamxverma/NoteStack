@@ -64,7 +64,7 @@ export default function BookmarksDashboard() {
   useEffect(() => {
     const fetchBookmarks = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/bookmarks', {
+        const response = await axios.get('https://notestack-o6b5.onrender.com/api/v1/bookmarks', {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -114,7 +114,7 @@ export default function BookmarksDashboard() {
   const toggleFavorite = async (id) => {
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/v1/bookmarks/${id}/favorite`,
+        `https://notestack-o6b5.onrender.com/api/v1/bookmarks/${id}/favorite`,
         {},
         {
           withCredentials: true,
@@ -136,7 +136,7 @@ export default function BookmarksDashboard() {
 
   const deleteBookmark = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/v1/bookmarks/${id}`, {
+      await axios.delete(`https://notestack-o6b5.onrender.com/api/v1/bookmarks/${id}`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

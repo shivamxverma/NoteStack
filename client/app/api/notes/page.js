@@ -12,7 +12,7 @@ export default function NotesDashboard() {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/notes', {
+        const response = await axios.get('https://notestack-o6b5.onrender.com/api/v1/notes', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
@@ -40,7 +40,7 @@ export default function NotesDashboard() {
   const toggleFavorite = async (id) => {
     try {
       await axios.post(
-        `http://localhost:8000/api/v1/notes/${id}/favorite`,
+        `https://notestack-o6b5.onrender.com/api/v1/notes/${id}/favorite`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -59,7 +59,7 @@ export default function NotesDashboard() {
 
   const deleteNote = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/v1/notes/${id}`, {
+      await axios.delete(`https://notestack-o6b5.onrender.com/api/v1/notes/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },

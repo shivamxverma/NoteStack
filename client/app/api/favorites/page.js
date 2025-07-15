@@ -12,7 +12,7 @@ export default function Favorites() {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/notes/favorites');
+        const response = await axios.get('https://notestack-o6b5.onrender.com/api/v1/notes/favorites');
         setFavorites(response.data);
       } catch (error) {
         console.error('Error fetching favorites:', error);

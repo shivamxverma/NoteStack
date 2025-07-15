@@ -21,7 +21,7 @@ export default function EditNote() {
       try {
         setLoading(true);
         console.log('Fetching note from API...');
-        const response = await axios.get(`http://localhost:8000/api/v1/notes/${id}`, {
+        const response = await axios.get(`https://notestack-o6b5.onrender.com/api/v1/notes/${id}`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -64,7 +64,7 @@ export default function EditNote() {
 
     try {
       setLoading(true);
-      await axios.put(`http://localhost:8000/api/v1/notes/${id}`, updatedNote, {
+      await axios.put(`https://notestack-o6b5.onrender.com/api/v1/notes/${id}`, updatedNote, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

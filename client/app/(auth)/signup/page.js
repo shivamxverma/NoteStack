@@ -18,7 +18,7 @@ export default function SignupPage() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/users/register', data);
+      const response = await axios.post('https://notestack-o6b5.onrender.com/api/v1/users/register', data);
       // localStorage.setItem('token', response.data.accessToken);
       router.push('/login');
     } catch (err) {
