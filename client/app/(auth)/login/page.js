@@ -23,7 +23,6 @@ export default function LoginPage() {
         { withCredentials: true }
       );
       console.log(response.data);
-      // Store user ID in localStorage if needed
       localStorage.setItem('userId', response.data.message.user.id);
       // No need to store accessToken; it’s handled by the cookie
       router.push('/');
