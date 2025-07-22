@@ -25,9 +25,7 @@ const getNoteById = asyncHandler(async (req, res) => {
 
 const createNote = asyncHandler(async (req, res) => {
     const { title, content ,tags } = req.body;
-
-    console.log(req.body);
-
+    
     if(!Array.isArray(tags)) {
         throw new ApiError(400, "Tags must be an array");
     }

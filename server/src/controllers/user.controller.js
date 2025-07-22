@@ -138,9 +138,6 @@ const loginUser = asyncHandler(async (req, res) => {
     .status(200)
     .cookie('accessToken', accessToken, options)
     .cookie('refreshToken', refreshToken, refreshTokenOptions)
-    .cookie('testCookie', 'testValue', options);
-
-  console.log('Set-Cookie Headers:', res.get('Set-Cookie'));
 
   return res.json(
     new ApiResponse(

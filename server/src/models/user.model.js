@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema(
   {
@@ -28,14 +28,6 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: [8, 'Password must be at least 8 characters long'],
     },
-    // favoritesNotes: {
-    //     type: [String],
-    //     default: [],
-    // },
-    // favoritesBookmarks: {
-    //     type: [String],
-    //     default: [],
-    // },
     refreshToken: {
       type: String,
       default: null,
