@@ -121,7 +121,7 @@ export default function EditBookmark() {
         }
       );
 
-      router.push('/api/bookmarks');
+      router.push('/bookmarks');
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors = { title: '', url: '', tags: '', form: '' };

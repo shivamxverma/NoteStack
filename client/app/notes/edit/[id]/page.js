@@ -76,7 +76,7 @@ export default function EditNote() {
           router.push('/login');
         } else {
           setErrors({ title: '', content: '', tags: '', form: 'Failed to load note. It may not exist.' });
-          router.push('/api/notes');
+          router.push('/notes');
         }
       } finally {
         setIsLoading(false);
@@ -115,7 +115,7 @@ export default function EditNote() {
 
       console.log('Note updated successfully:', response.data);
 
-      router.push('/api/notes');
+      router.push('/notes');
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors = { title: '', content: '', tags: '', form: '' };

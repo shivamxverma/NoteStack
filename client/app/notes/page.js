@@ -103,7 +103,7 @@ export default function NotesDashboard() {
               >
                 {note.favorite ? '★' : '☆'}
               </button>
-              <Link href={`/api/notes/edit/${note._id}`} className="text-blue-500">
+              <Link href={`/notes/edit/${note._id}`} className="text-blue-500">
                 Edit
               </Link>
               <button

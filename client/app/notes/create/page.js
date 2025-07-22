@@ -36,7 +36,7 @@ export default function CreateNote() {
       });
       const createdNote = response.data;
       console.log('Note created:', createdNote);
-      router.push('/api/notes');
+      router.push('/notes');
     }catch (error) {
       console.error('Error creating note:', error);
       alert('Failed to create note. Please try again.');

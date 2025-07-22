@@ -253,7 +253,7 @@ export default function BookmarksDashboard() {
                 <button onClick={() => toggleFavorite(bookmark._id)} className="text-yellow-500">
                   {bookmark.favorite ? '★' : '☆'}
                 </button>
-                <Link href={`/api/bookmarks/edit/${bookmark._id}`} className="text-blue-500">
+                <Link href={`/bookmarks/edit/${bookmark._id}`} className="text-blue-500">
                   Edit
                 </Link>
                 <button onClick={() => deleteBookmark(bookmark._id)} className="text-red-500">

@@ -80,7 +80,7 @@ export default function CreateBookmark() {
       });
 
       setTimeout(()=>{
-        router.push('/api/bookmarks');
+        router.push('/bookmarks');
       }, 1000);
     } catch (err) {
       if (err instanceof z.ZodError) {

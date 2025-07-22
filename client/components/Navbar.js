@@ -27,10 +27,10 @@ export default function Navbar() {
         {isAuthenticated && (
           <div className="space-x-4 flex items-center">
             <button onClick={handleLogout} className="hover:underline">Logout</button>
-            <Link href="/api/notes" className="hover:underline">Notes</Link>
-            <Link href="/api/bookmarks" className="hover:underline">Bookmarks</Link>
-            <Link href="/api/notes/create" className="hover:underline">Create Note</Link>
-            <Link href="/api/bookmarks/create" className="hover:underline">Create Bookmark</Link>
+            <Link href="/notes" className="hover:underline">Notes</Link>
+            <Link href="/bookmarks" className="hover:underline">Bookmarks</Link>
+            <Link href="/notes/create" className="hover:underline">Create Note</Link>
+            <Link href="/bookmarks/create" className="hover:underline">Create Bookmark</Link>
           </div>
         )}
       </div>
