@@ -49,7 +49,6 @@ export default function EditBookmark() {
   const router = useRouter();
   const { id } = useParams();
 
-  // Check authentication and fetch bookmark
   useEffect(() => {
     const fetchBookmark = async () => {
       const accessToken = localStorage.getItem('accessToken');
@@ -66,7 +65,7 @@ export default function EditBookmark() {
           },
         });
 
-        const bookmark = response.data;
+        const bookmark = response.data.message;
         setTitle(bookmark.title || '');
         setUrl(bookmark.url || '');
         setTags(bookmark.tags ? bookmark.tags.join(', ') : '');
@@ -122,7 +121,7 @@ export default function EditBookmark() {
         }
       );
 
-      router.push('/bookmarks');
+      router.push('/api/bookmarks');
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors = { title: '', url: '', tags: '', form: '' };

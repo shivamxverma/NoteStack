@@ -51,7 +51,7 @@ export default function LoginPage() {
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         {error && (
           <div className="mb-4 text-red-500 text-center">
-            Login failed. Please try again.
+            Invalid email or password. Please try again.
           </div>
         )}
         {success && (

@@ -24,7 +24,7 @@ const getBookmarkById = asyncHandler(async (req, res) => {
 });
 
 const createBookmark = asyncHandler(async (req, res) => {
-    const { title, url, tags } = req.body;
+    const { title, url, tags ,favorite} = req.body;
 
     if (!title && !url) {
         throw new ApiError(400, "Title and URL are required");
@@ -44,6 +44,7 @@ const createBookmark = asyncHandler(async (req, res) => {
         url,
         tags: Array.isArray(tags) ? tags : [],
         user: req.user._id,
+        favorite: favorite || false
     });
     
     return res.status(200).json(

@@ -43,7 +43,6 @@ export default function BookmarksDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check authentication status on mount
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
@@ -54,7 +53,6 @@ export default function BookmarksDashboard() {
     setIsLoading(false);
   }, [router]);
 
-  // Parse query parameters
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -77,7 +75,6 @@ export default function BookmarksDashboard() {
     }
   }, [searchParams, isAuthenticated]);
 
-  // Fetch bookmarks
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -92,7 +89,7 @@ export default function BookmarksDashboard() {
         const response = await axios.get('https://notestack-o6b5.onrender.com/api/v1/bookmarks', {
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${accessToken}`, // Use accessToken here
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -111,7 +108,6 @@ export default function BookmarksDashboard() {
     fetchBookmarks();
   }, [isAuthenticated, router]);
 
-  // Update URL with search parameters
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -122,7 +118,6 @@ export default function BookmarksDashboard() {
     router.replace(`?${currentParams.toString()}`, { scroll: false });
   }, [search, tags, favorite, router, isAuthenticated]);
 
-  // Toggle favorite status
   const toggleFavorite = async (id) => {
     if (!isAuthenticated) return;
 
@@ -153,7 +148,6 @@ export default function BookmarksDashboard() {
     }
   };
 
-  // Delete bookmark
   const deleteBookmark = async (id) => {
     if (!isAuthenticated) return;
 
@@ -177,7 +171,6 @@ export default function BookmarksDashboard() {
     }
   };
 
-  // Filter bookmarks
   const filteredBookmarks = bookmarks
     .filter(bookmark => bookmark._id)
     .filter(bookmark => {
@@ -199,12 +192,12 @@ export default function BookmarksDashboard() {
   }
 
   if (!isAuthenticated) {
-    return null; // or a minimal loading state while redirecting
+    return null; 
   }
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb- Hawkins">Bookmarks Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-4">Bookmarks Dashboard</h1>
       <div className="mb-4 flex flex-col gap-4">
         <input
           type="text"
@@ -236,19 +229,20 @@ export default function BookmarksDashboard() {
           <p>No bookmarks found.</p>
         ) : (
           filteredBookmarks.map(bookmark => (
-            <div key={bookmark._id} className="bg-white p-4 rounded shadow">
-              <h2 className="text-xl font-semibold">{bookmark.title}</h2>
+            <div key={bookmark._id} className="bg-white p-8 rounded shadow">
+              <h2 className="text-xl font-semibold break-words">{bookmark.title}</h2>
               {isValidUrl(bookmark.url) ? (
                 <a
                   href={bookmark.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500 hover:underline break-all block w-full"
+                  style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }}
                 >
                   {bookmark.url}
                 </a>
               ) : (
-                <p className="text-red-500">Invalid URL: {bookmark.url}</p>
+                <p className="text-red-500 break-all">Invalid URL: {bookmark.url}</p>
               )}
               {bookmark.tags?.length > 0 && (
                 <p className="text-gray-500 text-sm mt-1">

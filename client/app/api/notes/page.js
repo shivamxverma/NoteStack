@@ -101,7 +101,7 @@ export default function NotesDashboard() {
                 cursor="pointer"
                 aria-label={note.favorite ? 'Remove from favorites' : 'Add to favorites'}
               >
-                {user.favorite ? '★' : '☆'}
+                {note.favorite ? '★' : '☆'}
               </button>
               <Link href={`/api/notes/edit/${note._id}`} className="text-blue-500">
                 Edit
