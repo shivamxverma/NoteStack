@@ -1,5 +1,5 @@
 'use client';
-
+import React,{useState} from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signupSchema } from '../../lib/schemas';
@@ -16,19 +16,35 @@ export default function SignupPage() {
     resolver: zodResolver(signupSchema),
   });
 
+  const [error,setError] = useState(false); 
+  const [success, setSuccess] = useState(false);
+
   const onSubmit = async (data) => {
     try {
       const response = await axios.post('https://notestack-o6b5.onrender.com/api/v1/users/register', data);
-      // localStorage.setItem('token', response.data.accessToken);
-      router.push('/login');
+      setSuccess(true);
+      setTimeout(()=>{
+        router.push('/login');
+      },1000);
     } catch (err) {
-      alert(err.response?.data?.message || 'Signup failed');
+      setError(true);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        {error && (
+          <div className="mb-4 text-red-500 text-center">
+            Signup failed. Please try again.
+          </div>
+        )}
+        {success && (
+          <div className='mb-4 text-green-300 text-center font-bold'>
+            Signup successful! Redirecting to login...
+          </div>
+        )}
+
         <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">

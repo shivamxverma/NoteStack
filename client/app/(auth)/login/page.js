@@ -1,4 +1,5 @@
 'use client';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../../lib/schemas';
@@ -14,6 +15,9 @@ export default function LoginPage() {
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
+
+  const [error,seterror] = useState(false);
+  const [success , setsuccess] = useState(false);
 
   const onSubmit = async (data) => {
     try {
@@ -32,39 +36,32 @@ export default function LoginPage() {
       if (!accessToken) {
         throw new Error('No access token received');
       }
-
-      console.log('Login successful:', response.data.message.accessToken);
       localStorage.setItem('accessToken', accessToken);
-      router.push('/');
+      setsuccess(true);
+      setTimeout(()=>{
+        router.push('/');
+      },1000);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
-      alert(errorMessage);
-      console.error('Login error:', err);
+      seterror(true);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        {error && (
+          <div className="mb-4 text-red-500 text-center">
+            Login failed. Please try again.
+          </div>
+        )}
+        {success && (
+          <div className="mb-4 text-green-300 text-center font-bold">
+            Login successful! Redirecting...
+          </div>
+        )}
+        
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Username Field (Optional, uncomment if required by backend) */}
-          {/* <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              {...register('username')}
-              className={`mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring-2 ${
-                errors.username ? 'border-red-500' : 'focus:ring-blue-500'
-              }`}
-            />
-            {errors.username && (
-              <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
-            )}
-          </div> */}
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email

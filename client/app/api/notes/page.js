@@ -24,7 +24,6 @@ export default function NotesDashboard() {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        console.log(response.data.message)
         setNotes(Array.isArray(response.data.message) ? response.data.message : []);
       } catch (err) {
         setError(err.message || 'Failed to fetch notes');
@@ -48,9 +47,10 @@ export default function NotesDashboard() {
     try {
       await axios.post(
         `https://notestack-o6b5.onrender.com/api/v1/notes/${id}/favorite`,
+        {},
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         }
       );
@@ -68,7 +68,7 @@ export default function NotesDashboard() {
     try {
       await axios.delete(`https://notestack-o6b5.onrender.com/api/v1/notes/${id}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
       setNotes((prevNotes) => prevNotes.filter((note) => note._id !== id));
@@ -98,9 +98,10 @@ export default function NotesDashboard() {
               <button
                 onClick={() => toggleFavorite(note._id)}
                 className="text-yellow-500"
+                cursor="pointer"
                 aria-label={note.favorite ? 'Remove from favorites' : 'Add to favorites'}
               >
-                {note.favorite ? '★' : '☆'}
+                {user.favorite ? '★' : '☆'}
               </button>
               <Link href={`/api/notes/edit/${note._id}`} className="text-blue-500">
                 Edit

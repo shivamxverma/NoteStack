@@ -117,14 +117,16 @@ const markFavorite = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Bookmark not found or you do not have permission to access it");
     }
 
-    if (req.user.favoritesBookmarks.includes(bookmarkId)) {
-        req.user.favoritesBookmarks = req.user.favoritesBookmarks.filter(id => id.toString() !== bookmarkId.toString());
-        await req.user.save();
-        return new ApiResponse(200,{}, "Bookmark is Rmoved in favorites");
+    if (bookmark.favorite) {
+        bookmark.favorite = false;
+        await bookmark.save();
+        return res.status(200).json(
+            new ApiResponse(200, {}, "Bookmark removed from favorites")
+        );
     }
 
-    req.user.favoritesBookmarks.push(bookmarkId);
-    await req.user.save();
+    bookmark.favorite = true;
+    await bookmark.save();
 
     return res.status(200).json(
         new ApiResponse(200,{bookmarkId}, "Bookmark added to favorites successfully")

@@ -22,6 +22,10 @@ const bookmarkSchema = new mongoose.Schema({
       type: Date,
       default: () => new Date(),
     },
+    favorite: {
+        type: Boolean,
+        default: false,
+    },
     tags : [{
         type : String,
         trim : true,

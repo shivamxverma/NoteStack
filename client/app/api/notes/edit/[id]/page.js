@@ -39,7 +39,6 @@ export default function EditNote() {
   const router = useRouter();
   const { id } = useParams();
 
-  // Check authentication and fetch note
   useEffect(() => {
     const fetchNote = async () => {
       const accessToken = localStorage.getItem('accessToken');
@@ -62,11 +61,11 @@ export default function EditNote() {
           },
         });
 
-        const note = response.data.data;
+        const note = response.data.message;
         if (note) {
-          setTitle(note.title || '');
-          setContent(note.content || '');
-          setTags(note.tags ? note.tags.join(', ') : '');
+          setTitle(note.title);
+          setContent(note.content);
+          setTags(note.tags.join(','));
           setIsAuthenticated(true);
         }
       } catch (error) {
@@ -77,7 +76,7 @@ export default function EditNote() {
           router.push('/login');
         } else {
           setErrors({ title: '', content: '', tags: '', form: 'Failed to load note. It may not exist.' });
-          router.push('/notes');
+          router.push('/api/notes');
         }
       } finally {
         setIsLoading(false);
@@ -94,16 +93,8 @@ export default function EditNote() {
     }
 
     setIsSubmitting(true);
-    setErrors({ title: '', content: '', tags: '', form: '' });
 
     try {
-      const validatedData = noteSchema.parse({ title, content, tags });
-
-      const updatedNote = {
-        title: validatedData.title,
-        content: validatedData.content,
-        tags: validatedData.tags,
-      };
 
       const accessToken = localStorage.getItem('accessToken');
       if (!accessToken) {
@@ -112,16 +103,19 @@ export default function EditNote() {
         return;
       }
 
-      await axios.put(
+
+      const response = await axios.put(
         `${API_BASE_URL}/api/v1/notes/${id}`,
-        updatedNote,
+        { title, content, tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag) },
         {
           withCredentials: true,
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
 
-      router.push('/notes');
+      console.log('Note updated successfully:', response.data);
+
+      router.push('/api/notes');
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors = { title: '', content: '', tags: '', form: '' };
@@ -155,7 +149,7 @@ export default function EditNote() {
   }
 
   if (!isAuthenticated) {
-    return null; // Prevent rendering during redirect
+    return null;
   }
 
   return (

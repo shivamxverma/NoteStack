@@ -26,6 +26,10 @@ const noteSchema = new mongoose.Schema(
         message: 'Each tag must be a string with a maximum length of 50 characters',
       },
     },
+    favorite: {
+      type: Boolean,
+      default: false,
+    }, 
     visited: {
       type: Date,
       default: () => new Date(),
