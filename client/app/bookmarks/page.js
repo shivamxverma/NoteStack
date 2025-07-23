@@ -229,27 +229,40 @@ export default function BookmarksDashboard() {
           <p>No bookmarks found.</p>
         ) : (
           filteredBookmarks.map(bookmark => (
-            <div key={bookmark._id} className="bg-white p-8 rounded shadow">
-              <h2 className="text-xl font-semibold break-words">{bookmark.title}</h2>
-              {isValidUrl(bookmark.url) ? (
-                <a
-                  href={bookmark.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline break-all block w-full"
-                  style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }}
-                >
-                  {bookmark.url}
-                </a>
-              ) : (
-                <p className="text-red-500 break-all">Invalid URL: {bookmark.url}</p>
-              )}
-              {bookmark.tags?.length > 0 && (
-                <p className="text-gray-500 text-sm mt-1">
-                  Tags: {bookmark.tags.join(', ')}
-                </p>
-              )}
-              <div className="flex justify-between mt-2">
+            <div key={bookmark._id} className="bg-white p-8 rounded shadow flex flex-col h-full">
+              <div className="flex-1">
+                <h2 className="text-xl font-semibold break-words">{bookmark.title}</h2>
+                {isValidUrl(bookmark.url) ? (
+                  <a
+                    href={bookmark.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline break-all block w-full"
+                    style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }}
+                  >
+                    {bookmark.url}
+                  </a>
+                ) : (
+                  <p className="text-red-500 break-all">Invalid URL: {bookmark.url}</p>
+                )}
+                <div>
+                  {Array.isArray(bookmark.tags) && bookmark.tags.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      <span className="text-sm text-gray-500 w-full block">Tags: </span>
+                      {bookmark.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded mb-1"
+                          style={{ wordBreak: 'keep-all', whiteSpace: 'nowrap' }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-between mt-4">
                 <button onClick={() => toggleFavorite(bookmark._id)} className="text-yellow-500">
                   {bookmark.favorite ? '★' : '☆'}
                 </button>

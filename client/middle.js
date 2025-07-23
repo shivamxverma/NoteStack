@@ -4,17 +4,10 @@ import jwt from 'jsonwebtoken';
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith('/api/notes') || pathname.startsWith('/api/bookmarks') || pathname.startsWith('/api/dashboard')) {
-    const authHeader = request.headers.get('Authorization');
-    let token = null;
+  if (pathname.startsWith('/notes') || pathname.startsWith('/bookmarks') || pathname.startsWith('/dashboard')) {
+    const token = request.cookies.get('accessToken')?.value;
 
-    console.log('Authorization Header:', authHeader);
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.split(' ')[1];
-    }
-
-    console.log('Access Token:', token);
+    console.log('Checking token:', token);
 
     if (!token) {
       console.log('No token found, redirecting to login');
@@ -35,5 +28,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/api/notes/:path*', '/api/bookmarks/:path*', '/api/dashboard/:path*'],
+  matcher: ['/notes/:path*', '/bookmarks/:path*', '/dashboard/:path*'],
 };

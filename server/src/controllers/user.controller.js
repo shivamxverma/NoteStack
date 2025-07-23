@@ -122,15 +122,17 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: false,
+    sameSite: 'lax',
+    path: '/',
     maxAge: 24 * 60 * 60 * 1000,
   };
 
   const refreshTokenOptions = {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: false,
+    sameSite: 'lax',
+    path : '/',
     maxAge: 30 * 24 * 60 * 60 * 1000,
   };
 
