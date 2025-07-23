@@ -5,6 +5,7 @@ export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/notes') || pathname.startsWith('/bookmarks') || pathname.startsWith('/dashboard')) {
+    console.log(request);
     const token = request.cookies.get('accessToken')?.value;
 
     console.log('Checking token:', token);
@@ -15,8 +16,8 @@ export async function middleware(request) {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET); 
-      console.log('Decoded Token:', decoded);
+      // const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET); 
+      // console.log('Decoded Token:', decoded);
       return NextResponse.next();
     } catch (error) {
       console.error('Token verification failed:', error.message);

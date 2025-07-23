@@ -68,9 +68,9 @@ const updateNote = asyncHandler(async (req, res) => {
         { new: true, runValidators: true }
     );
 
-    console.log("Updated Note", note);
+    // console.log("Updated Note", note);
 
-    console.log("User ID", req.user._id);
+    // console.log("User ID", req.user._id);
 
     if (!note) {
         throw new ApiError(404, "Note not found or you do not have permission to update it");

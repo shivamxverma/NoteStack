@@ -2,8 +2,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import axios from 'axios';
+// import axios from 'axios';
 import { z } from 'zod';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import api from '../lib/api';
 
 const querySchema = z.object({
   search: z
@@ -86,12 +88,14 @@ export default function BookmarksDashboard() {
           return;
         }
 
-        const response = await axios.get('https://notestack-o6b5.onrender.com/api/v1/bookmarks', {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        // const response = await axios.get(`${API_BASE_URL}/api/v1/bookmarks`, {
+        //   withCredentials: true,
+        //   headers: {
+        //     Authorization: `Bearer ${accessToken}`,
+        //   },
+        // });
+
+        const response = await api.get('/bookmarks');
 
         setBookmarks(Array.isArray(response.data.message) ? response.data.message : []);
         setErrors({ form: '' });
@@ -123,16 +127,17 @@ export default function BookmarksDashboard() {
 
     try {
       const accessToken = localStorage.getItem('accessToken');
-      const response = await axios.post(
-        `https://notestack-o6b5.onrender.com/api/v1/bookmarks/${id}/favorite`,
-        {},
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      // const response = await axios.post(
+      //   `${API_BASE_URL}/api/v1/bookmarks/${id}/favorite`,
+      //   {},
+      //   {
+      //     withCredentials: true,
+      //     headers: {
+      //       Authorization: `Bearer ${accessToken}`,
+      //     },
+      //   }
+      // );
+      const response = await api.post(`/bookmarks/${id}/favorite`);
       const updatedBookmarks = bookmarks.map(bookmark =>
         bookmark._id === id ? { ...bookmark, favorite: !bookmark.favorite } : bookmark
       );
@@ -153,12 +158,13 @@ export default function BookmarksDashboard() {
 
     try {
       const accessToken = localStorage.getItem('accessToken');
-      await axios.delete(`https://notestack-o6b5.onrender.com/api/v1/bookmarks/${id}`, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      await api.delete(`/bookmarks/${id}`);
+      // await axios.delete(`${API_BASE_URL}/api/v1/bookmarks/${id}`, {
+      //   withCredentials: true,
+      //   headers: {
+      //     Authorization: `Bearer ${accessToken}`,
+      //   },
+      // });
       setBookmarks(bookmarks.filter(bookmark => bookmark._id !== id));
     } catch (error) {
       console.error('Error deleting bookmark:', error);
@@ -269,7 +275,7 @@ export default function BookmarksDashboard() {
                 <Link href={`/bookmarks/edit/${bookmark._id}`} className="text-blue-500">
                   Edit
                 </Link>
-                <button onClick={() => deleteBookmark(bookmark._id)} className="text-red-500">
+                <button onClick={() => deleteBookmark(bookmark._id)} className="text-red-500 cursor-pointer">
                   Delete
                 </button>
               </div>

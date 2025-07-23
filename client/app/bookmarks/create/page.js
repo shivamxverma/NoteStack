@@ -1,8 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+// import axios from 'axios';
+import api from '../../lib/api'
 import { z } from 'zod';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const bookmarkSchema = z.object({
   title: z
@@ -74,11 +76,12 @@ export default function CreateBookmark() {
         return;
       }
 
-      await axios.post('https://notestack-o6b5.onrender.com/api/v1/bookmarks', payload, {
-        withCredentials: true,
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // await axios.post(`${API_BASE_URL}/api/v1/bookmarks`, payload, {
+      //   withCredentials: true,
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
 
+      await api.post(`/bookmarks/`,payload);
       setTimeout(()=>{
         router.push('/bookmarks');
       }, 1000);

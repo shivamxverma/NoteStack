@@ -28,7 +28,7 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
             },
             process.env.REFRESH_TOKEN_SECRET,
             {
-                expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '1d',
+                expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '7d',
             }
         );
 
@@ -120,26 +120,18 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const loggedInUser = await User.findById(user._id).select('-password -refreshToken');
 
-  const options = {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 24 * 60 * 60 * 1000,
-  };
+//   const options = {
+//     maxAge: 120,
+//   };
 
-  const refreshTokenOptions = {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
-    path : '/',
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-  };
+//   const refreshTokenOptions = {
+//     maxAge: 120,
+//   };
 
   res
     .status(200)
-    .cookie('accessToken', accessToken, options)
-    .cookie('refreshToken', refreshToken, refreshTokenOptions)
+    .cookie('accessToken', accessToken)
+    .cookie('refreshToken', refreshToken)
 
   return res.json(
     new ApiResponse(
@@ -167,20 +159,20 @@ const LogoutUser = asyncHandler(async (req, res) => {
         }
     );
 
-    const options = {
-        httpOnly: false,
-        secure: false
-    };
+    // const options = {
+    //     httpOnly: false,
+    //     secure: false
+    // };
 
     return res
         .status(200)
-        .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
+        .clearCookie("accessToken")
+        .clearCookie("refreshToken")
         .json(new ApiResponse(200, {}, "User logged out"));
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-    const incomingRefreshToken = req.cookies.RefreshToken || req.body.RefreshToken;
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     if (!incomingRefreshToken) {
         throw new ApiError(400, "Refresh Token is required");
@@ -199,19 +191,19 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             throw new ApiError(403, "Invalid Refresh Token");
         }
 
-        const options = {
-            httpOnly: false,
-            secure: false,
-            maxAge: 24 * 60 * 60 * 1000
-        }
+        // const options = {
+        //     httpOnly: false,
+        //     secure: false,
+        //     maxAge: 24 * 60 * 60 * 1000
+        // }
 
         const { AccesToken, newRefreshToken } = await generateAccessTokenAndRefreshToken(user._id);
 
 
         return res
             .status(200)
-            .cookie("AccessToken", AccesToken, options)
-            .cookie("RefreshToken", newRefreshToken, options)
+            .cookie("AccessToken", AccesToken)
+            .cookie("RefreshToken", newRefreshToken)
             .json(
                 new ApiResponse(
                     200,

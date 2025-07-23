@@ -1,10 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import axios from 'axios';
+import api from '../../../lib/api';
 import { z } from 'zod';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://notestack-o6b5.onrender.com';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const noteSchema = z.object({
   title: z
@@ -54,12 +54,14 @@ export default function EditNote() {
       }
 
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/v1/notes/${id}`, {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        // const response = await axios.get(`${API_BASE_URL}/api/v1/notes/${id}`, {
+        //   withCredentials: true,
+        //   headers: {
+        //     Authorization: `Bearer ${accessToken}`,
+        //   },
+        // });
+
+        const response = await api.get(`/notes/${id}`);
 
         const note = response.data.message;
         if (note) {
@@ -104,14 +106,15 @@ export default function EditNote() {
       }
 
 
-      const response = await axios.put(
-        `${API_BASE_URL}/api/v1/notes/${id}`,
-        { title, content, tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag) },
-        {
-          withCredentials: true,
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
+      // const response = await axios.put(
+      //   `${API_BASE_URL}/api/v1/notes/${id}`,
+      //   { title, content, tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag) },
+      //   {
+      //     withCredentials: true,
+      //     headers: { Authorization: `Bearer ${accessToken}` },
+      //   }
+      // );
+      const response = await api.put(`/notes/${id}`,{title,content,tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag)});
 
       console.log('Note updated successfully:', response.data);
 

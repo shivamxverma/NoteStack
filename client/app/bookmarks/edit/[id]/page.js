@@ -1,10 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import axios from 'axios';
+// import axios from 'axios';
+import api from '../../../lib/api.js'
 import { z } from 'zod';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://notestack-o6b5.onrender.com';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const bookmarkSchema = z.object({
   title: z
@@ -58,12 +59,14 @@ export default function EditBookmark() {
       }
 
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/v1/bookmarks/${id}`, {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        // const response = await axios.get(`${API_BASE_URL}/api/v1/bookmarks/${id}`, {
+        //   withCredentials: true,
+        //   headers: {
+        //     Authorization: `Bearer ${accessToken}`,
+        //   },
+        // });
+
+        const response = await api.get(`/bookmarks/${id}`);
 
         const bookmark = response.data.message;
         setTitle(bookmark.title || '');
@@ -112,14 +115,15 @@ export default function EditBookmark() {
         return;
       }
 
-      await axios.put(
-        `${API_BASE_URL}/api/v1/bookmarks/${id}`,
-        updatedBookmark,
-        {
-          withCredentials: true,
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
+      // await axios.put(
+      //   `${API_BASE_URL}/api/v1/bookmarks/${id}`,
+      //   updatedBookmark,
+      //   {
+      //     withCredentials: true,
+      //     headers: { Authorization: `Bearer ${accessToken}` },
+      //   }
+      // );
+      await api.put(`/bookmarks/${id}`,updatedBookmark);
 
       router.push('/bookmarks');
     } catch (error) {

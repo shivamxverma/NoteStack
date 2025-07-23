@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../../lib/schemas';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function LoginPage() {
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(
-        'https://notestack-o6b5.onrender.com/api/v1/users/login',
+        `${API_BASE_URL}/api/v1/users/login`,
         {
           email: data.email,
           password: data.password,

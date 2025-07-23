@@ -1,8 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import axios from 'axios';
+import api from '../lib/api';
 import { useRouter } from 'next/navigation';
+
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function NotesDashboard() {
   const router = useRouter();
@@ -19,11 +21,12 @@ export default function NotesDashboard() {
         return;
       }
       try {
-        const response = await axios.get('https://notestack-o6b5.onrender.com/api/v1/notes', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        // const response = await axios.get(`${API_BASE_URL}/api/v1/notes`, {
+        //   headers: {
+        //     Authorization: `Bearer ${accessToken}`,
+        //   },
+        // });
+        const response = await api.get('/notes');
         setNotes(Array.isArray(response.data.message) ? response.data.message : []);
       } catch (err) {
         setError(err.message || 'Failed to fetch notes');
@@ -45,15 +48,16 @@ export default function NotesDashboard() {
 
   const toggleFavorite = async (id) => {
     try {
-      await axios.post(
-        `https://notestack-o6b5.onrender.com/api/v1/notes/${id}/favorite`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        }
-      );
+      // await axios.post(
+      //   `${API_BASE_URL}/api/v1/notes/${id}/favorite`,
+      //   {},
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      //     },
+      //   }
+      // );
+      await api.post(`/notes/${id}/favorite`);
       setNotes((prevNotes) =>
         prevNotes.map((note) =>
           note._id === id ? { ...note, favorite: !note.favorite } : note
@@ -66,11 +70,12 @@ export default function NotesDashboard() {
 
   const deleteNote = async (id) => {
     try {
-      await axios.delete(`https://notestack-o6b5.onrender.com/api/v1/notes/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
+      // await axios.delete(`${API_BASE_URL}/api/v1/notes/${id}`, {
+      //   headers: {
+      //     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      //   },
+      // });
+      await api.delete(`/notes/${id}`);
       setNotes((prevNotes) => prevNotes.filter((note) => note._id !== id));
     } catch (error) {
       console.error('Error deleting note:', error);
@@ -131,7 +136,7 @@ export default function NotesDashboard() {
                 </Link>
                 <button
                   onClick={() => deleteNote(note._id)}
-                  className="text-red-500"
+                  className="text-red-500 cursor-pointer"
                   aria-label="Delete note"
                 >
                   Delete

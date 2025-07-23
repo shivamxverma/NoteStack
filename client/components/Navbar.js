@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export default function Navbar() {
   const router = useRouter();
@@ -13,10 +14,25 @@ export default function Navbar() {
     setIsAuthenticated(Boolean(token));
   }, [isAuthenticated]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    setIsAuthenticated(false);
-    router.push('/login');
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      await axios.post(
+        'http://localhost:8000/api/v1/users/logout',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+      setIsAuthenticated(false);
+      localStorage.removeItem('accessToken');
+      router.push('/login');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

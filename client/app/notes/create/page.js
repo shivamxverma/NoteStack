@@ -1,7 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+// import axios from 'axios';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import api from '../../lib/api';
 
 export default function CreateNote() {
   const [title, setTitle] = useState('');
@@ -28,12 +30,13 @@ export default function CreateNote() {
         tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
       };
 
-      const response = await axios.post('https://notestack-o6b5.onrender.com/api/v1/notes', newNote,{
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
+      // const response = await axios.post(`${API_BASE_URL}/api/v1/notes`, newNote,{
+      //   withCredentials: true,
+      //   headers: {
+      //     Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      //   }
+      // });
+      const response = await api.post('/notes', newNote);
       const createdNote = response.data;
       console.log('Note created:', createdNote);
       router.push('/notes');
