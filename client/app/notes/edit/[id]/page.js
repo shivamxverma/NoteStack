@@ -4,8 +4,6 @@ import { useRouter, useParams } from 'next/navigation';
 import api from '../../../lib/api';
 import { z } from 'zod';
 
-// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
 const noteSchema = z.object({
   title: z
     .string()
@@ -54,13 +52,6 @@ export default function EditNote() {
       }
 
       try {
-        // const response = await axios.get(`${API_BASE_URL}/api/v1/notes/${id}`, {
-        //   withCredentials: true,
-        //   headers: {
-        //     Authorization: `Bearer ${accessToken}`,
-        //   },
-        // });
-
         const response = await api.get(`/notes/${id}`);
 
         const note = response.data.message;
@@ -104,20 +95,7 @@ export default function EditNote() {
         setIsSubmitting(false);
         return;
       }
-
-
-      // const response = await axios.put(
-      //   `${API_BASE_URL}/api/v1/notes/${id}`,
-      //   { title, content, tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag) },
-      //   {
-      //     withCredentials: true,
-      //     headers: { Authorization: `Bearer ${accessToken}` },
-      //   }
-      // );
       const response = await api.put(`/notes/${id}`,{title,content,tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag)});
-
-      console.log('Note updated successfully:', response.data);
-
       router.push('/notes');
     } catch (error) {
       if (error instanceof z.ZodError) {

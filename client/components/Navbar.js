@@ -18,7 +18,7 @@ export default function Navbar() {
     try {
       const token = localStorage.getItem('accessToken');
       await axios.post(
-        'http://localhost:8000/api/v1/users/logout',
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/logout`,
         {},
         {
           headers: {
