@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../../lib/schemas';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = 'http://localhost:8000';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function LoginPage() {
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/v1/users/login`,
+        `http://localhost:8000/api/v1/users/login`,
         {
           email: data.email,
           password: data.password,
