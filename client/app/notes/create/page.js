@@ -13,8 +13,6 @@ export default function CreateNote() {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
       router.push('/login');
-    } else {
-      setToken(accessToken);
     }
   }, []);
 

@@ -2,9 +2,21 @@ import asyncHandler from "../utils/asyncHandler.js";
 import Note from "../models/notes.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { redis } from "../config/redis.config.js";
+import { performance } from "perf_hooks";
 
 const getAllNotes = asyncHandler(async (req, res) => {
-    const notes = await Note.find({ user: req.user._id }).populate("user", "username fullName email");
+    let notes = await redis.get("notes");
+    if(notes){
+        return res.status(200).json(
+            new ApiResponse(200,JSON.parse(notes),"Notes fetch successfully")
+        );
+    }
+    notes = await Note.find({ user: req.user._id }).populate("user", "username fullName email");
+    if (!notes || notes.length === 0) {
+        throw new ApiError(404, "No notes found for this user");
+    }
+    await redis.set("notes", JSON.stringify(notes), "EX", 60);
     return res.status(200).json(
         new ApiResponse(200,notes, "Notes fetched successfully")
     );
@@ -48,6 +60,13 @@ const createNote = asyncHandler(async (req, res) => {
         user: req.user,
     });
 
+    if(!note){
+        throw new ApiError(500, "Failed to create note");
+    }
+
+    // Invalidate notes cache after creating a new note
+    await redis.del("notes");
+
     return res.status(200).json(
         new ApiResponse(200,note, "Note created successfully")
     );
@@ -67,10 +86,8 @@ const updateNote = asyncHandler(async (req, res) => {
         { title, content, tags },
         { new: true, runValidators: true }
     );
-
-    // console.log("Updated Note", note);
-
-    // console.log("User ID", req.user._id);
+        
+    redis.del("notes");
 
     if (!note) {
         throw new ApiError(404, "Note not found or you do not have permission to update it");
@@ -89,6 +106,8 @@ const deleteNote = asyncHandler(async (req, res) => {
     if (!note) {
         throw new ApiError(404, "Note not found or you do not have permission to delete it");
     }
+
+    redis.del("notes"); // Clear the notes cache after deletion
 
     return res.status(200).json(
         new ApiResponse(200,{}, "Note deleted successfully")

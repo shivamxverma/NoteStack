@@ -2,9 +2,21 @@ import asyncHandler from "../utils/asyncHandler.js";
 import Bookmark from "../models/bookmark.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { redis } from "../config/redis.config.js";
+import { performance } from "perf_hooks";
 
 const getAllBookmarks = asyncHandler(async (req, res) => {
-    const bookmarks = await Bookmark.find({ user: req.user._id }).populate("user", "username fullName email");
+    let bookmarks = await redis.get("bookmarks");
+    if(bookmarks){
+        return res.status(200).json(
+            new ApiResponse(200, JSON.parse(bookmarks), "Bookmarks fetched successfully")
+        );
+    }
+
+    bookmarks = await Bookmark.find({ user: req.user._id }).populate("user", "username fullName email");
+
+    await redis.set("bookmarks", JSON.stringify(bookmarks), "EX", 60);
+
     return res.status(200).json(
         new ApiResponse(200, bookmarks, "Bookmarks fetched successfully")
     );
@@ -46,6 +58,8 @@ const createBookmark = asyncHandler(async (req, res) => {
         user: req.user._id,
         favorite: favorite || false
     });
+
+    await redis.del("bookmarks"); 
     
     return res.status(200).json(
         new ApiResponse(200, bookmark, "Bookmark Created successfully")
@@ -70,6 +84,8 @@ const updateBookmark = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Bookmark not found or you do not have permission to update it");
     }
 
+    await redis.del("bookmarks");
+
     return res.status(200).json(
         new ApiResponse(200, bookmark, "Bookmark updated successfully")
     );
@@ -83,6 +99,8 @@ const deleteBookmark = asyncHandler(async (req, res) => {
     if (!bookmark) {
         throw new ApiError(404, "Bookmark not found or you do not have permission to delete it");
     }
+
+    await redis.del("bookmarks");
 
     return res.status(200).json(
         new ApiResponse(200, {}, "Bookmark deleted successfully")
