@@ -7,7 +7,25 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 dotenv.config();
 
-const generateAccessTokenAndRefreshToken = async (userId) => {
+enum ResponseStatus {
+    OK = 200,
+    CREATED = 201,
+    BAD_REQUEST = 400,
+    UNAUTHORIZED = 401,
+    FORBIDDEN = 403,
+    NOT_FOUND = 404,
+    CONFLICT = 409,
+    INTERNAL_SERVER_ERROR = 500
+}
+
+interface UserPayload {
+    _id: string;
+    username: string;
+    email: string;
+    fullName: string;
+}
+
+const generateAccessTokenAndRefreshToken = async (userId : string) => {
     try {
         const user = await User.findById(userId);
         const accessToken = jwt.sign(
@@ -49,7 +67,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (
         [fullName, email, password, username].some((field) => field?.trim() === "")
     ) {
-        throw new ApiError(400, "All fields are required");
+        throw new ApiError(ResponseStatus.BAD_REQUEST, "All fields are required");
     }
 
     const ExistedUser = await User.findOne({
@@ -62,11 +80,11 @@ const registerUser = asyncHandler(async (req, res) => {
     const hadhedPassword = await bcrypt.hash(password, 10);
 
     if (!hadhedPassword) {
-        throw new ApiError(500, "Something Went Wrong While Hashing Password");
+        throw new ApiError(ResponseStatus.INTERNAL_SERVER_ERROR, "Something Went Wrong While Hashing Password");
     }
 
     if (ExistedUser) {
-        throw new ApiError(409, "Username or Email already exists");
+        throw new ApiError(ResponseStatus.CONFLICT, "Username or Email already exists");
     }
 
 
@@ -75,18 +93,22 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         fullName,
         password : hadhedPassword,
-    })
+    });
 
-    const CreatedUser = await User.findById(user._id).select(
+    if (!user) {
+        throw new ApiError(ResponseStatus.INTERNAL_SERVER_ERROR, "SomeThing Went Wrong Registering User");
+    }
+
+    const CreatedUser : UserPayload | null = await User.findById(user._id).select(
         "-password -refreshToken"
     );
 
     if (!CreatedUser) {
-        throw new ApiError(500, "SomeThing Went Wrong Registering User");
+        throw new ApiError(ResponseStatus.INTERNAL_SERVER_ERROR, "SomeThing Went Wrong Registering User");
     }
 
-    return res.status(201).json(
-        new ApiResponse(200, CreatedUser, "User Registered Succesfully")
+    return res.status(ResponseStatus.CREATED).json(
+        new ApiResponse(ResponseStatus.CREATED, CreatedUser, "User Registered Succesfully")
     );
 });
 
@@ -96,7 +118,7 @@ const loginUser = asyncHandler(async (req, res) => {
   console.log('Body:', req.body);
 
   if (!username && !email) {
-    throw new ApiError(400, 'Username or Email is Required');
+    throw new ApiError(ResponseStatus.BAD_REQUEST, 'Username or Email is Required');
   }
 
   const user = await User.findOne({
@@ -112,21 +134,13 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(401, 'Invalid password');
   }
 
-  const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
+  const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id : ObjectId);
 
   if (!accessToken || !refreshToken) {
     throw new ApiError(500, 'Failed to generate tokens');
   }
 
   const loggedInUser = await User.findById(user._id).select('-password -refreshToken');
-
-//   const options = {
-//     maxAge: 120,
-//   };
-
-//   const refreshTokenOptions = {
-//     maxAge: 120,
-//   };
 
   res
     .status(200)
@@ -164,11 +178,13 @@ const LogoutUser = asyncHandler(async (req, res) => {
     //     secure: false
     // };
 
+    const response : Object = {};
+
     return res
         .status(200)
         .clearCookie("accessToken")
         .clearCookie("refreshToken")
-        .json(new ApiResponse(200, {}, "User logged out"));
+        .json(new ApiResponse(200, response, "User logged out"));
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -179,7 +195,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 
     try {
-        const docodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const docodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET!);
 
         const user = await User.findById(docodedToken?._id);
 

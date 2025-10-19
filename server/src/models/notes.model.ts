@@ -18,7 +18,7 @@ const noteSchema = new mongoose.Schema(
       type: [String],
       default: [],
       validate: {
-        validator: function (tags) {
+        validator: function (tags : string[]) {
           return tags.every(
             (tag) => typeof tag === 'string' && tag.length <= 50
           );
